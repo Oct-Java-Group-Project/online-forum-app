@@ -27,7 +27,7 @@ public class AuthController {
         return authService.addNewUser(registerRequest);
     }
 
-    @PatchMapping("/validate")
+    @GetMapping("/validate")
     public ResponseEntity<String> activateUserByToken(@RequestParam("token") String token) {
         return authService.activateUserByToken(token);
     }
