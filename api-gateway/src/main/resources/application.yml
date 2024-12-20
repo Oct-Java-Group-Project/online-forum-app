@@ -42,10 +42,17 @@ spring:
 #          filters:
 #            - AuthenticationFilter
 
+        - id: messages-service
+          uri: lb://MESSAGES-SERVICE
+          predicates:
+            - Path=/messages/**
+
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+      fetch-registry: true
+      register-with-eureka: true
 
 jwt:
   secret: d1M0MTVCMjFaUnRoZE9iZWlVY0VXMlVNWnBTSEhDNFNWQVpiLTlNdkJHdy1qRnRYUncydjFnRnY0M20yUXF4NXd6WFk2MDBHODhaYjZBd05Yc21zVlE=
