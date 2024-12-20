@@ -13,16 +13,16 @@ import java.util.Properties;
 public class EmailServiceImpl implements EmailService {
 
     @Value("${email.smtp.host}")
-    private String smtpHost;
+    public String smtpHost;
 
     @Value("${email.smtp.email}")
-    private String smtpEmail;
+    public String smtpEmail;
 
     @Value("${email.smtp.password}")
-    private String smtpPassword;
+    public String smtpPassword;
 
     @Value("${email.smtp.from.address}")
-    private String fromEmailAddress;
+    public String fromEmailAddress;
 
     @Override
     public void sendEmail(String recipientEmail, String firstname, String lastname, String url) throws MessagingException {
