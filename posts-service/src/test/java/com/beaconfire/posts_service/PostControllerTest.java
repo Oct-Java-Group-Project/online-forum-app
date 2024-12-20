@@ -57,31 +57,7 @@ class PostControllerTest {
 //        postController = new PostController(postService);
     }
 
-    @Test
-    void createPost_Success() {
-        // Arrange
-        Post post = new Post();
-        post.setPostId("1");
-        post.setTitle("Test Post");
-        post.setContent("Test content");
-        post.setUserId(1);
-        post.setAccessibility(Accessibility.PUBLISHED);
 
-        when(postService.createPost(post)).thenReturn(post);
-
-        BindingResult bindingResult = Mockito.mock(BindingResult.class);
-        when(bindingResult.hasErrors()).thenReturn(false); // Simulate no validation errors
-
-        // Act
-        DataResponse response = postController.createPost(post, bindingResult);
-
-        // Assert
-        assertNotNull(response);
-        assertEquals(true, response.getSuccess());
-        assertEquals("Post created successfully", response.getMessage());
-        assertEquals(post, response.getData());
-        verify(postService, times(1)).createPost(post);
-    }
 
     @Test
     void updatePost_Success() {

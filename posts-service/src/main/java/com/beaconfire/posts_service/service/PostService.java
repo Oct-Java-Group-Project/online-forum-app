@@ -54,7 +54,7 @@ public class PostService {
         return null; // Return null if user data is not found or an error occurs
     }
     
-    @Cacheable(value = "posts", key = "#postId", unless = "#result == null")
+//    @Cacheable(value = "posts", key = "#postId", unless = "#result == null")
     public List<PostWithUserDTO> getPostsByUserId(Integer userId) {
         List<Post> posts = postRepository.findByUserId(userId);
 
@@ -111,26 +111,16 @@ public class PostService {
     }
 
 
-    public Post createPost(Post post) {
-    	UserPermissionsDTO permissions = fetchUserPermissions(post.getUserId());
+   
+    public Post createPost(Post postRequest) {
+        // Set default metadata and timestamps
+        postRequest.setCreated_at(new Date());
+        postRequest.setUpdated_at(new Date());       
 
-        if (permissions == null || !permissions.getActive()) {
-            throw new IllegalStateException("User must verify their email to create a post.");
-        }
-        
-    	post.setPostId(UUID.randomUUID().toString());
-        post.setCreated_at(new Date());
-        post.setUpdated_at(new Date());
-
-        Metadata defaultMetadata = new Metadata();
-        defaultMetadata.setViews(0);
-        defaultMetadata.setLikes(0);
-        defaultMetadata.setCreatedAt(new Date());
-        defaultMetadata.setUpdatedAt(new Date());
-        post.setMetadata(defaultMetadata);
-
-        return postRepository.save(post);
+        // Save the post to the database
+        return postRepository.save(postRequest);
     }
+    
     public Post likePost(String postId, Integer userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
@@ -175,8 +165,8 @@ public class PostService {
 
 
 
-    @CachePut(value = "posts", key = "#postId")
-    @CacheEvict(value = "postsList", allEntries = true)
+//    @CachePut(value = "posts", key = "#postId")
+//    @CacheEvict(value = "postsList", allEntries = true)
     public PostWithUserDTO updatePost(String postId, Post updatedPost) {
         System.out.println("Fetching post with ID: " + postId);
         Post existingPost = postRepository.findById(postId)
@@ -265,7 +255,7 @@ public class PostService {
 
 
 
-    @Cacheable(value = "postsList")
+//    @Cacheable(value = "postsList")
     public List<PostWithUserDTO> getAllPosts() {
         List<Post> posts = postRepository.findAll();
 
@@ -469,7 +459,7 @@ public class PostService {
         return postRepository.save(existingPost);
     }
     
-    @CachePut(value = "posts", key = "#postId")
+//    @CachePut(value = "posts", key = "#postId")
     public PostWithUserDTO refreshPostCache(String postId) {
         return getPostById(postId);
     }

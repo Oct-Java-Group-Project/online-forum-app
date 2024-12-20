@@ -3,6 +3,7 @@ package com.beaconfire.posts_service.controller;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,6 +57,12 @@ public class PostController {
         }
     }
     
+//    @PostMapping
+//    public ResponseEntity<Post> createPost(@Valid @RequestBody Post postRequest) {
+//        Post createdPost = postService.createPost(postRequest);
+//        return new ResponseEntity<>(createdPost, HttpStatus.CREATED);
+//    }
+
     @Operation(summary = "Create a new post", description = "Creates a new post with the given details.")
     @PostMapping
     public DataResponse createPost(@Valid @RequestBody Post post, BindingResult result) {
