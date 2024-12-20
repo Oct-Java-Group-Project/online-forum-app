@@ -97,7 +97,7 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    private UserPermissionsDTO fetchUserPermissions(Integer userId) {
+    public UserPermissionsDTO fetchUserPermissions(Integer userId) {
         try {
             DataResponse response = userFeignClient.getUserById(userId);
             if (response.getSuccess()) {
@@ -335,15 +335,27 @@ public class PostService {
         targetReply.getSubReplies().add(subReply);
         return postRepository.save(post);
     }
+    
     public Post updateMetadata(String postId, Metadata metadata) {
         Post existingPost = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("Post not found with ID: " + postId));
-        
-        existingPost.setMetadata(metadata);
+
+        // Preserve existing metadata if new metadata fields are null
+        Metadata existingMetadata = existingPost.getMetadata();
+        if (metadata.getViews() != 0) existingMetadata.setViews(metadata.getViews());
+        if (metadata.getLikes() != 0) existingMetadata.setLikes(metadata.getLikes());
+        if (metadata.getLikesByUsers() != null) existingMetadata.setLikesByUsers(metadata.getLikesByUsers());
+
+        // Update metadata timestamps
+        existingMetadata.setUpdatedAt(new Date());
+        existingMetadata.setLastActivityAt(new Date());
+
+        existingPost.setMetadata(existingMetadata);
         existingPost.setUpdated_at(new Date());
-        
+
         return postRepository.save(existingPost);
     }
+
 
     public List<Post> getPostsByAccessibility(Accessibility accessibility) {
         return postRepository.findByAccessibility(accessibility);

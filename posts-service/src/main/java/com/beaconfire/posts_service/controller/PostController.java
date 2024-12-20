@@ -354,6 +354,13 @@ public class PostController {
     @PostMapping("/{postId}/replies")
     public DataResponse addReplyToPost(@PathVariable String postId, @RequestBody PostReply comment) {
     	try {
+    		if (comment == null) {
+                return DataResponse.builder()
+                        .success(false)
+                        .message("Comment cannot be null")
+                        .data(null)
+                        .build();
+            }
     	Post updatedPost = postService.addReplyToPost(postId, comment);
     	return DataResponse.builder()
                 .success(true)
@@ -379,30 +386,39 @@ public class PostController {
     
     @Operation(summary = "Add a sub-reply to a reply", description = "Adds a sub-reply to a specific reply in a post.")
     @PostMapping("/{postId}/replies/{replyId}/subreplies")
-    public DataResponse addSubReplyToReply(@PathVariable String postId, @PathVariable String replyId, @RequestBody SubReply subReply) {
-    	try {
-    	Post updatedPost = postService.addSubReplyToReply(postId, replyId, subReply);
-    	return DataResponse.builder()
-                .success(true)
-                .message("Replied successfully")
-                .data(updatedPost)
-                .build();
-    } catch (PostNotFoundException ex) {
-        // Handle case where the post is not found
-        return DataResponse.builder()
-                .success(false)
-                .message(ex.getMessage())
-                .data(null)
-                .build();
-    } catch (Exception ex) {
-        // Handle any unexpected errors
-        return DataResponse.builder()
-                .success(false)
-                .message("An unexpected error occurred: " + ex.getMessage())
-                .data(null)
-                .build();
+    public DataResponse addSubReplyToReply(
+            @PathVariable String postId,
+            @PathVariable String replyId,
+            @RequestBody SubReply subReply) {
+        try {
+            if (subReply == null) {
+                return DataResponse.builder()
+                        .success(false)
+                        .message("Sub-reply cannot be null")
+                        .data(null)
+                        .build();
+            }
+            Post updatedPost = postService.addSubReplyToReply(postId, replyId, subReply);
+            return DataResponse.builder()
+                    .success(true)
+                    .message("Sub-reply added successfully")
+                    .data(updatedPost)
+                    .build();
+        } catch (PostNotFoundException ex) {
+            return DataResponse.builder()
+                    .success(false)
+                    .message(ex.getMessage())
+                    .data(null)
+                    .build();
+        } catch (Exception ex) {
+            return DataResponse.builder()
+                    .success(false)
+                    .message("An unexpected error occurred: " + ex.getMessage())
+                    .data(null)
+                    .build();
+        }
     }
-  }
+
     @Operation(summary = "Update a reply", description = "Updates a specific reply in a post.")
     @PutMapping("/{postId}/replies/{replyId}")
     public DataResponse updateReply(
@@ -528,15 +544,22 @@ public class PostController {
                     .build();
         }
     }
-    
     @Operation(
             summary = "Like a Post",
-            description = "Allows a user to like a post. The user's ID is tracked to prevent duplicate likes."
+            description = "Allows a user to like a post. The user's ID is tracked to ensure proper functionality."
     )
     @PatchMapping("/{postId}/like")
     public ResponseEntity<DataResponse> likePost(
             @PathVariable String postId,
-            @RequestParam Integer userId) {
+            @RequestParam(required = false) Integer userId) {
+        if (userId == null) {
+            return ResponseEntity.badRequest().body(
+                    DataResponse.builder()
+                            .success(false)
+                            .message("Invalid user ID provided.")
+                            .data(null)
+                            .build());
+        }
         try {
             Post updatedPost = postService.likePost(postId, userId);
             return ResponseEntity.ok(
@@ -555,6 +578,7 @@ public class PostController {
         }
     }
 
+
     @Operation(
             summary = "Unlike a Post",
             description = "Allows a user to unlike a post. The user's ID is tracked to ensure proper functionality."
@@ -563,6 +587,15 @@ public class PostController {
     public ResponseEntity<DataResponse> unlikePost(
             @PathVariable String postId,
             @RequestParam Integer userId) {
+    	if (userId == null) {
+    	    return ResponseEntity.badRequest().body(
+    	            DataResponse.builder()
+    	                    .success(false)
+    	                    .message("Invalid user ID provided.")
+    	                    .data(null)
+    	                    .build());
+    	}
+
         try {
             Post updatedPost = postService.unlikePost(postId, userId);
             return ResponseEntity.ok(
@@ -588,7 +621,16 @@ public class PostController {
 
     @PatchMapping("/{postId}/views")
     public ResponseEntity<DataResponse> incrementPostViews(@PathVariable String postId) {
-        try {
+    	if (postId == null || postId.isEmpty()) {
+    	    return ResponseEntity.badRequest().body(
+    	            DataResponse.builder()
+    	                    .success(false)
+    	                    .message("Invalid post ID provided.")
+    	                    .data(null)
+    	                    .build());
+    	}
+
+    	try {
             Post updatedPost = postService.incrementViews(postId);
             return ResponseEntity.ok(
                     DataResponse.builder()
@@ -606,14 +648,8 @@ public class PostController {
         }            
      }
     
-
-
-
-
-
-
-
-
+    
+    
 
 
 }

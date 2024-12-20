@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -66,4 +67,21 @@ public class GlobalExceptionHandler {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<DataResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        // Collect all validation error messages
+        String errorMessage = ex.getBindingResult().getAllErrors().stream()
+                .map(error -> error.getDefaultMessage())
+                .reduce("", (acc, msg) -> acc.isEmpty() ? msg : acc + "; " + msg);
+
+        // Create a response entity with the collected messages
+        DataResponse response = DataResponse.builder()
+                .success(false)
+                .message("Validation failed: " + errorMessage)
+                .data(null)
+                .build();
+
+        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    }
+
 }
